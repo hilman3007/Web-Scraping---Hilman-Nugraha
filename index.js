@@ -1,6 +1,8 @@
 import express from 'express';
 import readline from 'readline';
+import path from 'path';
 import { scrapeEbay } from './scraper.js';
+import fs from 'fs';
 
 const app = express();
 const PORT = 3000;

@@ -34,7 +34,7 @@ export async function scrapeEbay(keyword) {
   let pageNum = 1;
 
   while (true) {
-    console.log(`Scraping page ${pageNum}`);
+    console.log(`Memulai Scraping Pada Page ${pageNum}`);
     const url = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(keyword)}&_pgn=${pageNum}`;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
@@ -57,13 +57,12 @@ export async function scrapeEbay(keyword) {
           await delay(4000);
           batchResults = await extractDataFromHTMLBatch(htmlOnly);
 
-          // Isi deskripsi dari halaman detail jika kosong
+          // Cek deskripsi kosong → ambil dari halaman detail
           for (let j = 0; j < batchResults.length; j++) {
             const result = batchResults[j];
             if (result.description === '-' || result.description.length < 30) {
               const productURL = batch[j].url;
               if (productURL) {
-                //console.log(`🔎 Mengambil deskripsi detail untuk: ${result.title}`);
                 const detailDesc = await getDescriptionFromDetailPage(browser, productURL);
                 result.description = detailDesc !== '-' ? detailDesc : result.description;
               }
@@ -75,7 +74,6 @@ export async function scrapeEbay(keyword) {
         } catch (err) {
           const msg = err.response?.data?.error?.message || err.message;
           console.log(`❌ Groq API Error: ${msg}`);
-
           if (msg.includes('Rate limit') || msg.includes('TPM')) {
             const waitMatch = msg.match(/try again in (\d+(\.\d+)?)s/);
             const waitMs = waitMatch ? parseFloat(waitMatch[1]) * 1000 : 5000;
@@ -95,24 +93,18 @@ export async function scrapeEbay(keyword) {
     }
 
     pageNum++;
-
-    // Simpan data ke file setiap halaman selesai
-    if (fs.existsSync(hasilFilePath)) {
-      const existingData = JSON.parse(fs.readFileSync(hasilFilePath, 'utf-8'));
-      const combined = [...existingData, ...allNewResults];
-      const unique = combined.filter(
-        (item, index, self) =>
-          index === self.findIndex(t => t.title === item.title && t.price === item.price)
-      );
-      fs.writeFileSync(hasilFilePath, JSON.stringify(unique, null, 2), 'utf-8');
-      console.log(`✅ Jumlah produk telah ditambahkan: ${allNewResults.length}`);
-    } else {
-      fs.writeFileSync(hasilFilePath, JSON.stringify(allNewResults, null, 2), 'utf-8');
-      console.log(`✅ Jumlah produk telah ditambahkan: ${allNewResults.length}`);
-    }
   }
 
   await browser.close();
-  console.log(`✅ Scraping telah selesai, masuk ke http://localhost:3000 untuk melihat isi hasil.json menyeluruh`);
+
+  // 💾 Simpan hasil scraping ke hasil.json
+  if (allNewResults.length > 0) {
+    fs.writeFileSync(hasilFilePath, JSON.stringify(allNewResults, null, 2), 'utf-8');
+    console.log(`✅ File hasil.json berhasil disimpan dengan ${allNewResults.length} produk`);
+  } else {
+    console.log('⚠️ Tidak ada produk valid untuk disimpan ke hasil.json');
+  }
+
+  console.log(`✅ Scraping telah selesai, masuk ke http://localhost:3000 untuk melihat hasil.`);
   return allNewResults;
 }

@@ -108,7 +108,7 @@ export async function extractDataFromHTMLBatch(htmlArray) {
       });
 
       if (filtered.length === 0) {
-        console.log('⚠️ Semua data kosong/tidak valid, dilewati.');
+        //console.log('⚠️ Semua data kosong/tidak valid, dilewati.');
         continue;
       }
 
