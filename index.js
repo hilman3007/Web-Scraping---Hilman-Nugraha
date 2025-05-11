@@ -18,7 +18,7 @@ rl.question('Masukkan keyword pencarian produk di eBay: ', (keyword) => {
 
   console.log(`\n✅ Keyword diset ke: "${currentKeyword}"`);
   console.log(`🟢 Server aktif di http://localhost:${PORT}`);
-  console.log(`🌐 Buka di browser: http://localhost:${PORT}/scrape?keyword=${encodedKeyword}\n`);
+  console.log(`🌐 Buka di browser untuk mulai scraping: http://localhost:${PORT}/scrape?keyword=${encodedKeyword}\n`);
 
   rl.close();
 

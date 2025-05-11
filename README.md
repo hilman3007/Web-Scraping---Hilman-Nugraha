@@ -72,7 +72,7 @@ Contoh output:
 ```
 ✅ Keyword diset ke: "nike"
 🟢 Server aktif di http://localhost:3000
-🌐 Buka di browser: http://localhost:3000/scrape?keyword=nike
+🌐 Buka di browser untuk mulai scraping: http://localhost:3000/scrape?keyword=nike
 ```
 
 ---------------------------------------------
